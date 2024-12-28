@@ -12,6 +12,7 @@ class EC extends Model
         'code',
         'nom',
         'coefficient',
+        'ue_id'
     ];
 
     public function ue(): BelongsTo

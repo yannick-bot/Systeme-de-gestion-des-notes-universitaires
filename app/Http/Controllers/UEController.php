@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\UE;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 use Illuminate\Http\Request;
 
 class UEController extends Controller
@@ -10,9 +13,12 @@ class UEController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): Response
     {
         //
+        return Inertia::render('UE/UE_Index', [
+            'ues' => UE::all()
+        ]);
     }
 
     /**
@@ -21,14 +27,16 @@ class UEController extends Controller
     public function create()
     {
         //
+        return Inertia::render('UE/UE_Form');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         //
+
     }
 
     /**
@@ -45,6 +53,9 @@ class UEController extends Controller
     public function edit(UE $uE)
     {
         //
+        Inertia::render('UE/UE_EditForm', [
+            'ue' => $uE
+        ]);
     }
 
     /**
@@ -53,6 +64,8 @@ class UEController extends Controller
     public function update(Request $request, UE $uE)
     {
         //
+
+
     }
 
     /**
@@ -61,5 +74,6 @@ class UEController extends Controller
     public function destroy(UE $uE)
     {
         //
+        
     }
 }

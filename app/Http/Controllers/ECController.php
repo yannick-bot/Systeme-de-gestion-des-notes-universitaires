@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Inertia\Inertia;
+use Inertia\Response;
 use App\Models\EC;
+use App\Models\UE;
 use Illuminate\Http\Request;
 
 class ECController extends Controller
@@ -10,9 +12,12 @@ class ECController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($id): Response
     {
         //
+        return Inertia::render('EC/EC_Index', [
+            'ecs' => EC::where('ue_id', $id)->get()
+        ]);
     }
 
     /**
@@ -21,6 +26,9 @@ class ECController extends Controller
     public function create()
     {
         //
+        return Inertia::render('EC/EC_Form', [
+            'ues' => UE::all()
+        ]);
     }
 
     /**
@@ -29,6 +37,8 @@ class ECController extends Controller
     public function store(Request $request)
     {
         //
+        
+
     }
 
     /**
@@ -45,6 +55,10 @@ class ECController extends Controller
     public function edit(EC $eC)
     {
         //
+        $allUEs = UE::all();
+        return Inertia::render('EC/EC_EditForm', [
+            'ec' => $eC, 'ues' => $allUEs
+        ]);
     }
 
     /**
@@ -53,6 +67,7 @@ class ECController extends Controller
     public function update(Request $request, EC $eC)
     {
         //
+
     }
 
     /**
@@ -61,5 +76,6 @@ class ECController extends Controller
     public function destroy(EC $eC)
     {
         //
+
     }
 }
