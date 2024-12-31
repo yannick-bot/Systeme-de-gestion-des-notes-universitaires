@@ -36,6 +36,8 @@ class UEController extends Controller
     public function store(Request $request): RedirectResponse
     {
         //
+        $format = "UE[1-9]{2}";
+
 
     }
 
@@ -74,6 +76,6 @@ class UEController extends Controller
     public function destroy(UE $uE)
     {
         //
-        
+
     }
 }
