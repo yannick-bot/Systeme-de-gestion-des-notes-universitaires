@@ -18,10 +18,10 @@ class UeFactory extends Factory
     {
         return [
             //
-            'code' => fake()->text(4),
+            'code' => fake()->lexify('????'),
             'nom' =>  fake()->text(),
-            'credits_ects' => fake()->numberBetween(-PHP_INT_MAX, PHP_INT_MAX),
-            'semestre' => fake()->numberBetween(-PHP_INT_MAX, PHP_INT_MAX)
+            'credits_ects' => fake()->numberBetween(-128, 127),
+            'semestre' => fake()->numberBetween(-128, 127)
         ];
     }
 }

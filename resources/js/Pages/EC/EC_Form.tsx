@@ -3,12 +3,12 @@ import { Head } from '@inertiajs/react';
 import MyInput from '@/Components/MyInput';
 import MyLabel from '@/Components/MyLabel';
 import { useForm, } from '@inertiajs/react';
-import { useEffect } from 'react';
+import InputError from '@/Components/InputError';
 
 interface UE {
     id: number;
     code: string,
-    name: string,
+    nom: string,
     credits_ects: number,
     semestre: number
 }
@@ -23,13 +23,13 @@ export default function EC({ues} : Data) {
         code: '',
         nom: '',
         coefficient: 0,
-        ue_id: 0
+        ue_id: ues[0].id
     });
+
+
 
     function handleSubmit(e : React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        let optValue = document.getElementById("ueID") as HTMLSelectElement;
-        setData('ue_id', Number(optValue.value));
         post(route('EC.store'), { onSuccess: () => reset() });
     }
 
@@ -55,6 +55,7 @@ export default function EC({ues} : Data) {
                                 inputValue={data.code}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
                             />
+                           {errors.code &&  <InputError message={errors.code} className="mt-2" />}
                             <MyInput
                                 type='text'
                                 name='nom'
@@ -63,6 +64,7 @@ export default function EC({ues} : Data) {
                                 inputValue={data.nom}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('nom', e.target.value)}
                             />
+                            {errors.nom && <InputError message={errors.nom} className="mt-2" />}
                             <MyInput
                                 type='number'
                                 name='coefficient'
@@ -71,14 +73,17 @@ export default function EC({ues} : Data) {
                                 inputValue={data.coefficient}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('coefficient', Number(e.target.value))}
                             />
+                            {errors.coefficient && <InputError message={errors.coefficient} className="mt-2" />}
                             <MyLabel labelFor="ueID">UE: </MyLabel>
                             <select name="ue"
                                 id="ueID"
+                                onChange={e => setData('ue_id', Number(e.target.value))}
                             >
                                 {ues.map(ue => {
-                                    return <option key={ue.id} value={ue.id}>{ue.name}</option>
+                                    return <option key={ue.id} value={ue.id}>{ue.nom}</option>
                                 })}
                             </select>
+                            {errors.ue_id && <InputError message={errors.ue_id} className="mt-2" />}
 
                             <div className='my-4'>
                                 <button disabled={processing} className='rounded-xl p-2 border-2'>Enregistrer</button>

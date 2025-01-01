@@ -8,25 +8,24 @@ use App\Models\UE;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 
-abstract class UETests extends BaseTestCase
+class UETest extends BaseTestCase
 {
     // TEST 1
     public function test_de_creation_d_une_UE_valide() {
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $reponse = $this->post('/UE/create', [
+        $reponse = $this->followingRedirects()->post(route('UE.store'), [
             'code' => 'UE04',
             'nom' => 'ARITHMETIQUE',
             'credits_ects' => 15,
             'semestre' => 1,
         ]);
-        $reponse->assertStatus(302);
-        // Suivre la redirection et vérifier le statut final
-        $suiviReponse = $this->get($reponse->headers->get('Location'));
-        $suiviReponse->assertStatus(200);
+        $reponse->assertStatus(200);
+
+
         // Vérifier que le chirp a été ajouté à la base de données
-        $this->assertDatabaseHas('chirps', [
+        $this->assertDatabaseHas('u_e_s', [
             'code' => 'UE04',
             'nom' => 'ARITHMETIQUE',
             'credits_ects' => 15,
@@ -40,23 +39,21 @@ abstract class UETests extends BaseTestCase
     public function test_de_verification_des_credits_ECTS() {
         $user = User::factory()->create();
         $this->actingAs($user);
-        $uE = UE::factory()->create();
-        $reponse = $this->post('/UE/create', [
-            'code' => $uE->code,
-            'nom' => $uE->nom,
-            'credits_ects' => $uE->credits_ects,
-            'semestre' => $uE->semestre
+        $reponse = $this->post(route('UE.store'), [
+            'code' => 'UE68',
+            'nom' => 'NE PASSE PAS',
+            'credits_ects' => 97,
+            'semestre' => 3
         ]);
-        if($uE->credits_ects < 1 || $uE->credits_ects > 30) {
-            $reponse->assertSessionHasErrors(['credits_ects']);
-        }
+
+        $reponse->assertSessionHasErrors(['credits_ects']);
     }
 
     //TEST 3 (Cela implique que lorsqu'on crée une UE on définisse au moins 1 EC)
     public function test_d_association_des_ECs_a_une_UE() {
         $user = User::factory()->create();
         $this->actingAs($user);
-        $reponse = $this->post('/UE/create', [
+        $reponse = $this->post(route('UE.store'), [
             'code' => 'UE12',
             'nom' => 'ALGEBRE',
             'credits_ects' => 4,
@@ -74,29 +71,29 @@ abstract class UETests extends BaseTestCase
         $createdUeId = $createdUe->id;
 
         // Vérifie que la réponse redirige vers l'URL spécifiée
-        $reponse->assertRedirect('/EC/create');
-        $this->followingRedirects()
-            ->post('/EC/create', [
+        $reponse->assertRedirect(route('EC.create'));
+        $reponse2 = $this->followingRedirects()
+            ->post(route('EC.store'), [
                 'code' => 'EC5',
                 'nom' => 'Algebre lineaire',
                 'coefficient' => 2,
                 'ue_id' => $createdUeId
-            ])
-            ->assertStatus(200); // Assure que le POST est traité correctement
+            ]);
+        $reponse2->assertStatus(200); // Assure que le POST est traité correctement
 
     }
 
-    //TEST 4 NB: Ecrire un regex pour valider le format
+    //TEST 4
     function test_validation_du_code_UE() {
         $format = '/^UE[1-9]{2}$/';
         $user = User::factory()->create();
         $this->actingAs($user);
-        $uE = UE::factory()->create();
-        $reponse = $this->followingRedirects()->post('/UE/create', [
+        $uE = UE::factory()->make();
+        $reponse = $this->post(route('UE.store'), [
             'code' => $uE->code,
             'nom' => $uE->nom,
-            'credits_ects' => $uE->credits_ects,
-            'semestre' => $uE->semestre
+            'credits_ects' => 28,
+            'semestre' => 3
         ]);
         if (preg_match($format, $uE->code) !== 1) {
             $reponse->assertSessionHasErrors(['code']);
@@ -107,21 +104,25 @@ abstract class UETests extends BaseTestCase
     }
 
     // TEST 5
-    function test_de_verification_du_semestre() {
+    public function test_de_verification_du_semestre()
+    {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $uE = UE::factory()->create();
-        $reponse = $this->followingRedirects()->post('/UE/create', [
-            'code' => $uE->code,
+
+        $reponse = $this->post(route('UE.store'), [
+            'code' => 'UE45',
             'nom' => $uE->nom,
-            'credits_ects' => $uE->credits_ects,
-            'semestre' => $uE->semestre
+            'credits_ects' => 2,
+            'semestre' => $uE->semestre,
         ]);
+
         if ($uE->semestre < 1 || $uE->semestre > 6) {
+
             $reponse->assertSessionHasErrors(['semestre']);
         } else {
-            $reponse->assertStatus(200);
+            $reponse->assertStatus(200); // Assurez-vous que l'UE est bien créée
         }
     }
 }

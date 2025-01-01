@@ -19,9 +19,9 @@ class EcFactory extends Factory
     {
         return [
             //
-            'code' => fake()->text(4),
+            'code' => fake()->lexify('????'),
             'nom' => fake()->text(),
-            'coefficient' => fake()->numberBetween(-PHP_INT_MAX, PHP_INT_MAX),
+            'coefficient' => fake()->numberBetween(-128, 127),
             'ue_id' => UE::factory()
         ];
     }

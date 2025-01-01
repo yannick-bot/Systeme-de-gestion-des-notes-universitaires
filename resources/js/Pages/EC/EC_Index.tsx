@@ -1,14 +1,15 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { InertiaLink } from '@inertiajs/inertia-react'
+import { Inertia } from '@inertiajs/inertia'
 
 
 interface EC {
     id: number;
     code: string,
-    name: string,
-    credits_ects: number,
-    semestre: number
+    nom: string,
+    coefficient: number,
+    ue_id: number
 }
 
 interface Data {
@@ -16,6 +17,10 @@ interface Data {
 }
 
 export default function Index({ ecs }: Data) {
+
+    console.log(typeof(ecs))
+    const handleDelete = (id: number) => { Inertia.delete(route('EC.destroy', id)); };
+
     return (
         <AuthenticatedLayout
             header={
@@ -37,10 +42,9 @@ export default function Index({ ecs }: Data) {
                         <table cellPadding="50" border={1} align="center">
                             <thead>
                                 <tr>
-                                    <th>Code UE</th>
+                                    <th>Code EC</th>
                                     <th>Nom</th>
-                                    <th>ECTS</th>
-                                    <th>Semestre</th>
+                                    <th>Coefficient</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -48,19 +52,15 @@ export default function Index({ ecs }: Data) {
                             <tbody>
                                 {
                                     ecs.map(ec =>
-                                        (
+                                       (
                                             <tr key={ec.id}>
-                                                <td>{ec.code}</td>
-                                                <td>{ec.name}</td>
-                                                <td>{ec.credits_ects}</td>
-                                                <td>{ec.semestre}</td>
+                                                <td className='text-center'>{ec.code}</td>
+                                                <td className='text-center'>{ec.nom}</td>
+                                                <td className='text-center'>{ec.coefficient}</td>
                                                 <td className='flex'>
-                                                    <InertiaLink href={route('EC.edit', {ec})}>
-                                                        <button className='rounded-xl p-2 border-2'>EDIT</button>
-                                                    </InertiaLink>
-                                                    <InertiaLink href={route('EC.destroy', {ec})}>
-                                                        <button className='rounded-xl p-2 border-2'>DELETE</button>
-                                                    </InertiaLink>
+
+                                                    <button className="rounded-xl p-2 border-2 ml-2"><a href={route('EC.edit', ec.id)}>EDIT</a></button>
+                                                    <button onClick={() => handleDelete(ec.id)} className="rounded-xl p-2 border-2 ml-2" > DELETE </button>
                                                 </td>
                                             </tr>
                                         )

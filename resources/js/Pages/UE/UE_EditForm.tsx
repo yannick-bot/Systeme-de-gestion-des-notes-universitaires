@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/react';
 import MyInput from '@/Components/MyInput';
 import MyLabel from '@/Components/MyLabel';
 import { useForm } from '@inertiajs/react';
+import InputError from '@/Components/InputError';
 
 interface UE {
     id: number;
@@ -12,11 +13,15 @@ interface UE {
     semestre: number
 }
 
-export default function UE(ue: UE) {
+interface Prop {
+    ue: UE
+}
+
+export default function UE({ue}: Prop) {
 
     const semestres = [1, 2, 3, 4, 5, 6]
-
-    const { data, setData, post, processing, reset, errors } = useForm({
+    console.log(ue);
+    const { data, setData, patch, processing, reset, errors } = useForm({
         code: ue.code,
         nom: ue.nom,
         credits_ects: ue.credits_ects,
@@ -25,9 +30,7 @@ export default function UE(ue: UE) {
 
     function handleSubmit(e : React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        let optValue = document.getElementById("semestreID") as HTMLSelectElement;
-        setData('semestre', Number(optValue.value));
-        post(route('UE.update'), { onSuccess: () => reset() });
+        patch(route('UE.update', ue.id), { onSuccess: () => reset() });
     }
 
     return (
@@ -52,6 +55,7 @@ export default function UE(ue: UE) {
                                 inputValue={data.code}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
                             />
+                            <InputError message={errors.code} className="mt-2" />
                             <MyInput
                                 type='text'
                                 name='nom'
@@ -60,6 +64,7 @@ export default function UE(ue: UE) {
                                 inputValue={data.nom}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('nom', e.target.value)}
                             />
+                            <InputError message={errors.nom} className="mt-2" />
                             <MyInput
                                 type='number'
                                 name='credits_ects'
@@ -68,8 +73,9 @@ export default function UE(ue: UE) {
                                 inputValue={data.credits_ects}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('credits_ects', Number(e.target.value))}
                             />
+                            <InputError message={errors.credits_ects} className="mt-2" />
                             <MyLabel labelFor="semestreID">SEMESTRE: </MyLabel>
-                            <select name="semestre" id="semestreID">
+                            <select name="semestre" id="semestreID" onChange={e => setData('semestre', Number(e.target.value))}>
                                 {semestres.map(semestre => {
                                     return <option key={semestre} value={semestre}>{semestre}</option>
                                 })}

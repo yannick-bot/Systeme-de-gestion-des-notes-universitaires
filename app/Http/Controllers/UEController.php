@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class UEController extends Controller
 {
@@ -16,8 +17,9 @@ class UEController extends Controller
     public function index(): Response
     {
         //
+        $ues = UE::all();
         return Inertia::render('UE/UE_Index', [
-            'ues' => UE::all()
+            'ues' => $ues
         ]);
     }
 
@@ -36,9 +38,16 @@ class UEController extends Controller
     public function store(Request $request): RedirectResponse
     {
         //
-        $format = "UE[1-9]{2}";
+        $validated = $request->validate([
+            'nom' => 'required|string|max:255',
+            'credits_ects' => 'required|integer|between:1,30',
+            'code' => ['required', 'string', 'max:4', 'regex:/^UE[0-9]{2}$/'],
+            'semestre' => 'required|integer|in:1,2,3,4,5,6',
+        ]);
 
+        UE::create($validated);
 
+        return redirect(route('EC.create'));
     }
 
     /**
@@ -52,10 +61,10 @@ class UEController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(UE $uE)
+    public function edit(UE $uE):Response
     {
         //
-        Inertia::render('UE/UE_EditForm', [
+        return Inertia::render('UE/UE_EditForm', [
             'ue' => $uE
         ]);
     }
@@ -66,16 +75,24 @@ class UEController extends Controller
     public function update(Request $request, UE $uE)
     {
         //
-
+        $validated = $request->validate([
+            'nom' => 'required|string|max:255',
+            'credits_ects' => 'required|integer',
+            'code' => 'required|string|max:4',
+            'semestre' => 'required|integer|in:1,2,3,4,5,6',
+        ]);
+        $uE->update($validated);
+        return redirect(route('UE.index'));
 
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(UE $uE)
+    public function destroy(UE $uE): RedirectResponse
     {
         //
-
+        $uE->delete();
+        return redirect(route('UE.index'));
     }
 }

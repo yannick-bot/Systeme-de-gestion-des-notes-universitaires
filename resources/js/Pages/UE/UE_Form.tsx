@@ -3,6 +3,8 @@ import { Head } from '@inertiajs/react';
 import MyInput from '@/Components/MyInput';
 import MyLabel from '@/Components/MyLabel';
 import { useForm } from '@inertiajs/react';
+import InputError from '@/Components/InputError';
+import { ListboxSelectedOption } from '@headlessui/react';
 
 
 export default function UE() {
@@ -13,15 +15,15 @@ export default function UE() {
         code: '',
         nom: '',
         credits_ects: 0,
-        semestre: 0
+        semestre: 1
     });
 
-    function handleSubmit(e : React.FormEvent<HTMLFormElement>) {
+
+
+    const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        let optValue = document.getElementById("semestreID") as HTMLSelectElement;
-        setData('semestre', Number(optValue.value));
-        post(route('UE.store'), { onSuccess: () => reset() });
-    }
+        post(route('UE.store'));
+    };
 
     return (
         <AuthenticatedLayout
@@ -45,6 +47,7 @@ export default function UE() {
                                 inputValue={data.code}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
                             />
+                            {errors.code && <InputError message={errors.code} className="mt-2" />}
                             <MyInput
                                 type='text'
                                 name='nom'
@@ -53,6 +56,7 @@ export default function UE() {
                                 inputValue={data.nom}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('nom', e.target.value)}
                             />
+                            {errors.nom && <InputError message={errors.nom} className="mt-2" />}
                             <MyInput
                                 type='number'
                                 name='credits_ects'
@@ -61,13 +65,14 @@ export default function UE() {
                                 inputValue={data.credits_ects}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('credits_ects', Number(e.target.value))}
                             />
+                            {errors.credits_ects && <InputError message={errors.credits_ects} className="mt-2" />}
                             <MyLabel labelFor="semestreID">SEMESTRE: </MyLabel>
-                            <select name="semestre" id="semestreID">
+                            <select name="semestre" id="semestreID" onChange={e => setData('semestre', Number(e.target.value))}>
                                 {semestres.map(semestre => {
                                     return <option key={semestre} value={semestre}>{semestre}</option>
                                 })}
                             </select>
-
+                            {errors.semestre && <InputError message={errors.semestre} className="mt-2" />}
                             <div className='my-4'>
                                 <button disabled={processing} className='rounded-xl p-2 border-2'>Enregistrer</button>
                             </div>

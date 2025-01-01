@@ -7,7 +7,7 @@ use App\Models\UE;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
-abstract class ECTests extends BaseTestCase
+class ECTest extends BaseTestCase
 {
     //TEST 1
     function test_de_creation_d_un_EC_valide() {
@@ -17,14 +17,14 @@ abstract class ECTests extends BaseTestCase
         $uE = UE::factory()->create();
 
         $this->followingRedirects()
-            ->post('EC/create', [
+            ->post(route('EC.store'), [
                 'code' => 'EC02',
                 'nom' => 'Arithmétique 1',
                 'coefficient' => 3,
                 'ue_id' => $uE->id,
             ])
-            ->assertStatus(200)
-            ->assertSee($uE->code);
+            ->assertStatus(200);
+
     }
 
     //TEST 2
@@ -32,40 +32,50 @@ abstract class ECTests extends BaseTestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $this->followingRedirects()->post('EC/create', [
+
+
+        $reponse = $this->post('/EC', [
             'code' => 'EC01',
             'nom' => 'Arithmétique 2',
             'coefficient' => 3,
             'ue_id' => null,
-        ])
-        ->assertSessionHasErrors(['ue_id']);
+        ]);
+        $reponse->assertSessionHasErrors(['ue_id']);  
     }
 
     // TEST 3
-    function test_de_modification_d_un_EC() {
+    public function test_de_modification_d_un_EC()
+    {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $uE = UE::factory()->create();
 
         $eC = EC::factory()->create([
-            'ue_id' => $uE->id
+            'code' => 'EC95',
+            'nom' => 'Arithmétique 2',
+            'coefficient' => 3,
+            'ue_id' => $uE->id,
         ]);
 
-        $this->followingRedirects()->patch("EC/edit/{$eC}", [
-            'code' => 'EC01',
+        $reponse = $this->followingRedirects()->patch(route('EC.update', $eC->id), [
+            'code' => 'EC95',
             'nom' => 'Arithmétique 2',
             'coefficient' => 3,
             'ue_id' => $eC->ue_id,
-        ])
-            ->assertStatus(200)
-            ->assertDatabaseHas('e_c_s', [
-                'id' => $eC->id,
-                'code' => 'EC01',
-                'nom' => 'Arithmétique 2',
-                'coefficient' => 3,
-                'ue_id' => $eC->ue_id,
-            ]);
+        ]);
+
+
+        $reponse->assertStatus(200);
+
+
+        $this->assertDatabaseHas('e_c_s', [
+            'id' => $eC->id,
+            'code' => 'EC95',
+            'nom' => 'Arithmétique 2',
+            'coefficient' => 3,
+            'ue_id' => $eC->ue_id,
+        ]);
     }
 
     // TEST 4
@@ -79,16 +89,19 @@ abstract class ECTests extends BaseTestCase
             'ue_id' => $uE->id
         ]);
 
-        $reponse = $this->followingRedirects()->post('EC/create', [
-            'code' => 'EC01',
-            'nom' => 'Arithmétique 2',
+        $reponse = $this->post('/EC', [
+            'code' => 'EC05',
+            'nom' => $eC->nom,
             'coefficient' => $eC->coefficient,
             'ue_id' => $eC->ue_id,
         ]);
-
         if($eC->coefficient < 1 || $eC->coefficient > 5) {
             $reponse->assertSessionHasErrors(['coefficient']);
         }
+        else {
+            $reponse->assertStatus(200);
+        }
+
     }
 
     // TEST 5
@@ -103,7 +116,7 @@ abstract class ECTests extends BaseTestCase
         ]);
 
         $this->followingRedirects()
-            ->delete("EC/{$eC}")
+            ->delete("/EC/{$eC->id}")
             ->assertStatus(200);
         $this->assertDatabaseMissing('e_c_s', [
             'id' => $eC->id

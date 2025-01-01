@@ -3,7 +3,9 @@ import { Head } from '@inertiajs/react';
 import MyInput from '@/Components/MyInput';
 import MyLabel from '@/Components/MyLabel';
 import { useForm, } from '@inertiajs/react';
+import InputError from '@/Components/InputError';
 import { useEffect } from 'react';
+
 
 interface UE {
     id: number;
@@ -13,12 +15,8 @@ interface UE {
     semestre: number
 }
 
-interface Data {
-    ues: UE[]
-}
-
 interface EC {
-    id: number;
+    id: number,
     code: string,
     nom: string,
     coefficient: number,
@@ -26,20 +24,28 @@ interface EC {
 }
 
 
-export default function EditECForm({ues} : Data, props: EC) {
+interface Props {
+    ues: UE[];
+    ec: EC;
+}
 
-    const { data, setData, post, processing, reset, errors } = useForm({
-        code: props.code,
-        nom: props.nom,
-        coefficient: props.coefficient,
-        ue_id: props.ue_id
+
+export default function EditECForm({ec, ues}: Props ) {
+console.log( route('EC.update', ec.id));
+
+
+    const { data, setData, patch, processing, reset, errors } = useForm({
+        code: ec.code,
+        nom: ec.nom,
+        coefficient: ec.coefficient,
+        ue_id: ec.ue_id
     });
+
+
 
     function handleSubmit(e : React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        let optValue = document.getElementById("ueID") as HTMLSelectElement;
-        setData('ue_id', Number(optValue.value));
-        post(route('EC.update'), { onSuccess: () => reset() });
+        patch(route('EC.update', ec.id), { onSuccess: () => reset() });
     }
 
     return (
@@ -64,6 +70,7 @@ export default function EditECForm({ues} : Data, props: EC) {
                                 inputValue={data.code}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
                             />
+                            {errors.code &&  <InputError message={errors.code} className="mt-2" />}
                             <MyInput
                                 type='text'
                                 name='nom'
@@ -72,6 +79,7 @@ export default function EditECForm({ues} : Data, props: EC) {
                                 inputValue={data.nom}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('nom', e.target.value)}
                             />
+                            {errors.nom && <InputError message={errors.nom} className="mt-2" />}
                             <MyInput
                                 type='number'
                                 name='coefficient'
@@ -80,22 +88,18 @@ export default function EditECForm({ues} : Data, props: EC) {
                                 inputValue={data.coefficient}
                                 onChangeValue={(e : React.ChangeEvent<HTMLInputElement>) => setData('coefficient', Number(e.target.value))}
                             />
+                            {errors.coefficient && <InputError message={errors.coefficient} className="mt-2" />}
                             <MyLabel labelFor="ueID">UE: </MyLabel>
                             <select name="ue"
                                 id="ueID"
+                                value={data.ue_id}
+                                onChange={e => setData('ue_id', Number(e.target.value))}
                             >
                                 {ues.map(ue => {
-                                    let display;
-                                    if (ue.id === data.ue_id) {
-                                        display = <option key={ue.id} value={ue.id} selected>{ue.nom}</option>
-                                    }
-                                    else {
-                                        display = <option key={ue.id} value={ue.id}>{ue.nom}</option>
-                                    }
-                                    return display
+                                   return <option key={ue.id} value={ue.id}> {ue.nom} </option>
                                 })}
                             </select>
-
+                            {errors.ue_id && <InputError message={errors.ue_id} className="mt-2" />}
                             <div className='my-4'>
                                 <button disabled={processing} className='rounded-xl p-2 border-2'>Enregistrer</button>
                             </div>
