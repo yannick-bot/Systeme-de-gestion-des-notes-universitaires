@@ -4,6 +4,8 @@ import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
+import 'remixicon/fonts/remixicon.css';
+
 
 export default function Authenticated({
     header,
@@ -32,6 +34,9 @@ export default function Authenticated({
                                     active={route().current('dashboard')}
                                 >
                                     Dashboard
+                                </NavLink>
+                                <NavLink href={route('UE.index')} active={route().current('UE.index')}>
+                                    UEs
                                 </NavLink>
                             </div>
                         </div>
