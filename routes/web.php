@@ -1,10 +1,12 @@
 <?php
 
+
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ECController;
 use App\Http\Controllers\UEController;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\NoteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EtudiantController;
 
@@ -30,7 +32,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Routes pour la gestion des étudiants
 Route::middleware('auth')->group(function () {
     // Liste des étudiants
     Route::get('/etudiants', [EtudiantController::class, 'index'])->name('etudiants.index');
@@ -51,18 +52,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/etudiants/{etudiant}', [EtudiantController::class, 'destroy'])->name('etudiants.destroy');
 });
 
-//Route::resource('etudiants', EtudiantController::class);
 
 
-
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
 
 Route::resource('UE', UEController::class)
     ->only(['index', 'store', 'create'])
@@ -114,6 +105,23 @@ Route::patch('EC/{ec}', [ECController::class, 'update'])
 Route::delete('EC/{eC}', [ECController::class, 'destroy'])
     ->name('EC.destroy')
     ->middleware(['auth', 'verified']);
+
+    Route::middleware('auth')->group(function () {
+        // Afficher les notes d'un étudiant
+        Route::get('/etudiants/{id}/notes', [NoteController::class, 'showNotes'])->name('etudiants.notes.show');
+
+        // Formulaire de saisie des notes
+        Route::get('/notes/create', [NoteController::class, 'create'])->name('notes.create');
+
+        // Enregistrer une note
+        Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
+
+        // Mettre à jour les notes d'un étudiant
+        Route::post('/etudiants/{id}/notes', [NoteController::class, 'update'])->name('notes.update');
+
+        // Afficher les résultats par semestre
+        Route::get('/resultats-semestre', [NoteController::class, 'resultatsParSemestre'])->name('resultats.semestre');
+    });
 
 
 require __DIR__.'/auth.php';

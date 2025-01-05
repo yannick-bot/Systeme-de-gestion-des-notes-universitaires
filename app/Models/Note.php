@@ -7,8 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Note extends Model
 {
+
     //
     protected $fillable = [
+        'etudiant_id',
+        'ec_id',
         'note',
         'session',
         'date_evaluation'
@@ -17,5 +20,10 @@ class Note extends Model
     public function etudiant(): BelongsTo
     {
         return $this->belongsTo(Etudiant::class);
+    }
+
+    public function ec(): BelongsTo
+    {
+        return $this->belongsTo(EC::class, 'ec_id');
     }
 }

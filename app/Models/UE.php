@@ -21,4 +21,9 @@ class UE extends Model
     {
         return $this->hasMany(EC::class);
     }
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
+
 }

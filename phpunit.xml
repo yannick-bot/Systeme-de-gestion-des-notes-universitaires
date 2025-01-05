@@ -6,14 +6,15 @@
 >
     <testsuites>
         <testsuite name="Unit">
-            <directory>tests/Unit</directory>
+            <directory suffix="Test.php">tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
-            <directory>tests/Feature</directory>
+            <directory suffix="Test.php">tests/Feature</directory>
         </testsuite>
-        <testsuite name="My Test Suite">
-            <directory suffix="Test.php">tests</directory>
-        </testsuite>
+        <!-- Supprime My Test Suite ou ajuste son inclusion si nécessaire -->
+        <!-- <testsuite name="My Test Suite">
+            <directory suffix="Test.php">tests/Other</directory>
+        </testsuite> -->
     </testsuites>
     <source>
         <include>

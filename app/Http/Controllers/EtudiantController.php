@@ -47,6 +47,8 @@ class EtudiantController extends Controller
 }
 
 
+
+
     /**
      * Display the specified resource.
      */

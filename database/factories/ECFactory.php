@@ -8,7 +8,7 @@ use App\Models\UE;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\EC>
  */
-class EcFactory extends Factory
+class ECFactory extends Factory
 {
     /**
      * Define the model's default state.
